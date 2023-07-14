@@ -1,11 +1,25 @@
-import { Document, Model } from 'mongoose';
+import { Document, Model, Types } from 'mongoose';
+import { IBook } from '../book/book.interface';
+
+
+export const ReadingStatus = {
+  ToRead: 'To Read',
+  CurrentlyReading: 'Currently Reading',
+  FinishedReading: 'Finished Reading',
+} as const;
+
+type ReadingStatusType = (typeof ReadingStatus)[keyof typeof ReadingStatus];
 
 
 export interface IUser extends Document {
   email: string;
   password: string;
+  wishlist?: Types.ObjectId[] | IBook[];
+  readingList?: Array<{
+    book: Types.ObjectId | IBook;
+    status: ReadingStatusType;
+  }>;
 }
-
 
 export type ILoginUser = {
   email: string;
@@ -20,8 +34,6 @@ export type ILoginUserResponse = {
 export type IRefreshTokenResponse = {
   accessToken: string;
 };
-
-
 
 export type UserModel = {
   isUserExist: (
