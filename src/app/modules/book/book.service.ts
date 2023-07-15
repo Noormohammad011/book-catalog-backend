@@ -9,6 +9,7 @@ import { Review } from '../reviews/reviews.model';
 import { bookSearchableFields } from './book.constants';
 import { IBook, IBookFilters } from './book.interface';
 import { Book } from './book.model';
+import { Types } from 'mongoose';
 
 const getAllBooks = async (
   filters: IBookFilters,
@@ -128,11 +129,15 @@ const deleteBook = async (
   id: string,
 ): Promise<IBook | null> => {
   const session = await Book.startSession();
+
   try {
     session.startTransaction();
-    const isExist = await Book.findOne({ _id: id, authorID: userID });
+    const isExist = await Book.findOne({
+      _id: id,
+      authorID: new Types.ObjectId(userID),
+    });
     if (!isExist) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'User not found !');
+      throw new ApiError(httpStatus.NOT_FOUND, 'Book not found!');
     }
     const result = await Book.findByIdAndDelete(id).session(session);
     await Review.deleteMany({ book: id }).session(session);
