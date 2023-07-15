@@ -26,7 +26,7 @@ export interface IBook extends Document {
   authorID: Types.ObjectId | IUser;
   genre: Genres;
   publicationDate: Date;
-  reviews?: Types.ObjectId[] | IReview[];
+  reviews?: Array<{ reviewID: Types.ObjectId | IReview }>;
 }
 
 export type IBookFilters = {

@@ -52,7 +52,10 @@ const getAllBooks = async (
   const result = await Book.find(whereConditions)
     .populate({
       path: 'authorID',
-      select: 'readingList wishlist email name',
+      populate: {
+        path: 'readingList.book',
+        select: '-status', // Exclude the 'status' field from the book object in readingList
+      },
     })
     .populate({
       path: 'reviews',

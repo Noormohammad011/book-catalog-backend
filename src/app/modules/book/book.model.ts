@@ -27,12 +27,11 @@ export const bookSchema = new Schema<IBook, BookModel>(
     },
     reviews: [
       {
-        type: Schema.Types.ObjectId,
-        ref: 'Review',
-      },
-    //   {
-    //     _id: false,
-    //   },
+        _id: false,
+        reviewID: {
+          type: Schema.Types.ObjectId,
+        },
+      }
     ],
   },
   {

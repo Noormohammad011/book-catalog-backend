@@ -32,15 +32,13 @@ const createReview = async (
       comment: reviewComment,
     };
 
-   
     const review = await Review.create([reviewData], { session });
 
-    
     if (!book.reviews) {
       book.reviews = [];
     }
 
-    book.reviews.push(review[0]._id);
+    book.reviews.push({ reviewID: review[0]._id });
 
     await book.save({ session });
 
@@ -54,6 +52,7 @@ const createReview = async (
     session.endSession();
   }
 };
+
 
 
 export const ReviewService = {
