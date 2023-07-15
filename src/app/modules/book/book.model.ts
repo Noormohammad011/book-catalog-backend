@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { BookModel, IBook } from './book.interface';
+import { BookModel, Genres, IBook } from './book.interface';
 
 export const bookSchema = new Schema<IBook, BookModel>(
   {
@@ -14,6 +14,7 @@ export const bookSchema = new Schema<IBook, BookModel>(
     },
     genre: {
       type: String,
+      enum: Object.values(Genres),
       required: true,
     },
     publicationDate: {
