@@ -23,4 +23,11 @@ router.post(
   AuthController.refreshToken
 );
 
+router.post('/reading-list', AuthController.addBookToReadingList);
+router.patch('/reading-list', AuthController.updateReadingStatus);
+
+router.post('/wishlist', AuthController.createWishlist);
+router.delete('/wishlist/:bookId', AuthController.removeFromWishlist);
+
+
 export const AuthRoute = router;

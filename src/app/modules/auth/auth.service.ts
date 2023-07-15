@@ -1,13 +1,16 @@
 import httpStatus from 'http-status';
 import { Secret } from 'jsonwebtoken';
+import { Types } from 'mongoose';
 import config from '../../../config';
 import ApiError from '../../../errors/ApiError';
 import { jwtHelpers } from '../../../helpers/jwtHelpers';
+import { IBook } from '../book/book.interface';
 import {
   ILoginUser,
   ILoginUserResponse,
   IRefreshTokenResponse,
   IUser,
+  ReadingStatusType,
 } from './auth.interface';
 import { User } from './auth.model';
 const createUser = async (payload: IUser): Promise<IUser | null> => {
@@ -41,7 +44,7 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   );
 
   const refreshToken = jwtHelpers.createToken(
-    { _id , userEmail },
+    { _id, userEmail },
     config.jwt.refresh_secret as Secret,
     config.jwt.refresh_expires_in as string,
   );
@@ -86,8 +89,121 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
   };
 };
 
+const createWishlist = async (
+  userId: string,
+  bookId: string,
+): Promise<IUser | null> => {
+  const bookObjectId = new Types.ObjectId(bookId);
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  // Check if the book is already in the wishlist
+  if (
+    user.wishlist &&
+    user.wishlist.includes(bookObjectId as Types.ObjectId & IBook)
+  ) {
+    throw new ApiError(httpStatus.CONFLICT, 'Book already in the wishlist');
+  }
+
+  if (!user.wishlist) {
+    user.wishlist = [];
+  }
+  user.wishlist.push(bookObjectId as Types.ObjectId & IBook);
+  await user.save();
+  return user;
+};
+
+const removeFromWishlist = async (
+  userId: string,
+  bookId: string,
+): Promise<IUser | null> => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  const bookObjectId = new Types.ObjectId(bookId);
+  if (
+    !user.wishlist ||
+    !user.wishlist.includes(bookObjectId as Types.ObjectId & IBook)
+  ) {
+    throw new ApiError(httpStatus.CONFLICT, 'Book not in the wishlist');
+  }
+  user.wishlist = user.wishlist.filter(book => book !== bookObjectId);
+  await user.save();
+  return user;
+};
+
+const addBookToReadingList = async (
+  userId: string,
+  bookId: string,
+  status: ReadingStatusType,
+): Promise<IUser | null> => {
+  const bookObjectId = new Types.ObjectId(bookId);
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found!');
+  }
+
+  // Ensure the readingList property exists
+  if (!user.readingList) {
+    user.readingList = [];
+  }
+
+  // Check if the book is already in the reading list
+  const existingBookIndex = user.readingList.findIndex(
+    readingItem => readingItem.book.toString() === bookId,
+  );
+  if (existingBookIndex !== -1) {
+    throw new ApiError(httpStatus.CONFLICT, 'Book already in the reading list');
+  }
+
+  // Add the book to the reading list
+  const readingItem = {
+    book: bookObjectId as Types.ObjectId | IBook,
+    status,
+  };
+  user.readingList.push(readingItem);
+
+  await user.save();
+  return user;
+};
+
+const updateReadingStatus = async (
+  userId: string,
+  bookId: string,
+  status: ReadingStatusType,
+): Promise<IUser | null> => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found!');
+  }
+
+  // Ensure the readingList property exists
+  if (!user.readingList) {
+    user.readingList = [];
+  }
+
+  // Check if the book is already in the reading list
+  const existingBookIndex = user.readingList.findIndex(
+    readingItem => readingItem.book.toString() === bookId,
+  );
+  if (existingBookIndex === -1) {
+    throw new ApiError(httpStatus.CONFLICT, 'Book not in the reading list');
+  }
+
+  // update the book status in the reading list
+  user.readingList[existingBookIndex].status = status;
+  await user.save();
+  return user;
+};
+
 export const UserService = {
   createUser,
   loginUser,
   refreshToken,
+  createWishlist,
+  removeFromWishlist,
+  addBookToReadingList,
+  updateReadingStatus,
 };

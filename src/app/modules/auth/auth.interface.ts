@@ -8,19 +8,18 @@ export const ReadingStatus = {
   FinishedReading: 'Finished Reading',
 } as const;
 
-type ReadingStatusType = (typeof ReadingStatus)[keyof typeof ReadingStatus];
+export type ReadingStatusType = (typeof ReadingStatus)[keyof typeof ReadingStatus];
 
 
 export interface IUser extends Document {
   email: string;
   password: string;
-  wishlist?: Types.ObjectId[] | IBook[];
+  wishlist?: (Types.ObjectId & IBook)[] | undefined;
   readingList?: Array<{
     book: Types.ObjectId | IBook;
     status: ReadingStatusType;
   }>;
 }
-
 export type ILoginUser = {
   email: string;
   password: string;
