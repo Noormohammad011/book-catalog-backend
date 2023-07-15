@@ -6,6 +6,10 @@ import { IUser, ReadingStatus, UserModel } from './auth.interface';
 
 const userSchema = new Schema<IUser, UserModel>(
   {
+    name: {
+      type: String,
+      required: true,
+    },
     email: {
       type: String,
       required: true,

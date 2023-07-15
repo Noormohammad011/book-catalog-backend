@@ -8,6 +8,10 @@ export const bookSchema = new Schema<IBook, BookModel>(
       required: true,
     },
     author: {
+      type: String,
+      required: true,
+    },
+    authorID: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
@@ -36,5 +40,14 @@ export const bookSchema = new Schema<IBook, BookModel>(
     versionKey: false,
   },
 );
+
+bookSchema.set('toJSON', {
+  transform: function (doc, ret) {
+    if (ret.publicationDate instanceof Date) {
+      ret.publicationDate = ret.publicationDate.toLocaleDateString('en-US');
+    }
+  },
+});
+
 
 export const Book = model<IBook, BookModel>('Book', bookSchema);

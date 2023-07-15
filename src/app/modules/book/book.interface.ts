@@ -22,7 +22,8 @@ export enum Genres {
 
 export interface IBook extends Document {
   title: string;
-  author: Types.ObjectId | IUser;
+  author: string;
+  authorID: Types.ObjectId | IUser;
   genre: Genres;
   publicationDate: Date;
   reviews?: Types.ObjectId[] | IReview[];

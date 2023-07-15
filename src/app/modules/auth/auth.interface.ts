@@ -12,6 +12,7 @@ export type ReadingStatusType = (typeof ReadingStatus)[keyof typeof ReadingStatu
 
 
 export interface IUser extends Document {
+  name: string;
   email: string;
   password: string;
   wishlist?: (Types.ObjectId & IBook)[] | undefined;
@@ -36,7 +37,7 @@ export type IRefreshTokenResponse = {
 
 export type UserModel = {
   isUserExist: (
-    phoneNumber: string,
+    email: string,
   ) => Promise<Pick<IUser, 'password' | 'email' | '_id'>>;
   isPasswordMatched(
     givenPassword: string,
