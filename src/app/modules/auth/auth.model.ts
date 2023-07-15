@@ -30,6 +30,7 @@ const userSchema = new Schema<IUser, UserModel>(
     ],
     readingList: [
       {
+        _id: false,
         book: {
           type: Schema.Types.ObjectId,
           ref: 'Book',

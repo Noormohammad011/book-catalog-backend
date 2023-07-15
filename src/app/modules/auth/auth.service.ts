@@ -114,7 +114,6 @@ const createWishlist = async (
   return user;
 };
 
-
 const removeFromWishlist = async (
   userId: string,
   bookId: string,
@@ -156,7 +155,7 @@ const addBookToReadingList = async (
 
   // Check if the book is already in the reading list
   const existingBookIndex = user.readingList.findIndex(
-    readingItem => readingItem.book.toString() === bookId,
+    readingItem => readingItem.book?.toString() === bookId,
   );
   if (existingBookIndex !== -1) {
     throw new ApiError(httpStatus.CONFLICT, 'Book already in the reading list');
@@ -164,7 +163,7 @@ const addBookToReadingList = async (
 
   // Add the book to the reading list
   const readingItem = {
-    book: bookObjectId as Types.ObjectId | IBook,
+    book: bookObjectId,
     status,
   };
   user.readingList.push(readingItem);
@@ -190,7 +189,7 @@ const updateReadingStatus = async (
 
   // Check if the book is already in the reading list
   const existingBookIndex = user.readingList.findIndex(
-    readingItem => readingItem.book.toString() === bookId,
+    readingItem => readingItem.book?.toString() === bookId,
   );
   if (existingBookIndex === -1) {
     throw new ApiError(httpStatus.CONFLICT, 'Book not in the reading list');
@@ -204,11 +203,16 @@ const updateReadingStatus = async (
 
 const userProfile = async (userId: string): Promise<IUser | null> => {
   const result = await User.findById(userId)
-    .populate('wishlist')
-    .populate('readingList.book');
+    .populate({
+      path: 'wishlist.bookID',
+      select: '-_id', // Exclude _id field
+    })
+    .populate({
+      path: 'readingList.book',
+      select: '-_id', 
+    });
   return result;
 };
-
 export const UserService = {
   createUser,
   loginUser,
