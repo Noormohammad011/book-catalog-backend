@@ -3,7 +3,6 @@ import { Schema, model } from 'mongoose';
 import config from '../../../config';
 import { IUser, ReadingStatus, UserModel } from './auth.interface';
 
-
 const userSchema = new Schema<IUser, UserModel>(
   {
     name: {
@@ -22,8 +21,11 @@ const userSchema = new Schema<IUser, UserModel>(
     },
     wishlist: [
       {
-        type: Schema.Types.ObjectId,
-        ref: 'Book',
+        _id: false,
+        bookID: {
+          type: Schema.Types.ObjectId,
+          ref: 'Book',
+        },
       },
     ],
     readingList: [
@@ -56,14 +58,14 @@ userSchema.pre<IUser>('save', async function (next) {
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(
     this.password,
-    Number(config.bycrypt_salt_rounds)
+    Number(config.bycrypt_salt_rounds),
   );
   next();
 });
 
 userSchema.statics.isPasswordMatched = async function (
   givenPassword: string,
-  savedPassword: string
+  savedPassword: string,
 ): Promise<boolean> {
   return await bcrypt.compare(givenPassword, savedPassword);
 };

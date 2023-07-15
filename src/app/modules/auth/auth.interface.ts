@@ -15,7 +15,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  wishlist?: (Types.ObjectId & IBook)[] | undefined;
+  wishlist?: Array<{ bookID: Types.ObjectId | IBook }>;
   readingList?: Array<{
     book: Types.ObjectId | IBook;
     status: ReadingStatusType;

@@ -93,7 +93,7 @@ const createWishlist = async (
   userId: string,
   bookId: string,
 ): Promise<IUser | null> => {
-  const bookObjectId = new Types.ObjectId(bookId);
+  const bookObjectId = new Types.ObjectId(bookId) as Types.ObjectId & IBook;
   const user = await User.findById(userId);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
@@ -101,7 +101,7 @@ const createWishlist = async (
   // Check if the book is already in the wishlist
   if (
     user.wishlist &&
-    user.wishlist.includes(bookObjectId as Types.ObjectId & IBook)
+    user.wishlist.some(item => item.bookID.equals(bookObjectId))
   ) {
     throw new ApiError(httpStatus.CONFLICT, 'Book already in the wishlist');
   }
@@ -109,10 +109,11 @@ const createWishlist = async (
   if (!user.wishlist) {
     user.wishlist = [];
   }
-  user.wishlist.push(bookObjectId as Types.ObjectId & IBook);
+  user.wishlist.push({ bookID: bookObjectId });
   await user.save();
   return user;
 };
+
 
 const removeFromWishlist = async (
   userId: string,
@@ -122,14 +123,17 @@ const removeFromWishlist = async (
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
+
   const bookObjectId = new Types.ObjectId(bookId);
-  if (
-    !user.wishlist ||
-    !user.wishlist.includes(bookObjectId as Types.ObjectId & IBook)
-  ) {
-    throw new ApiError(httpStatus.CONFLICT, 'Book not in the wishlist');
+
+  if (!user.wishlist) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Book not in the wishlist');
   }
-  user.wishlist = user.wishlist.filter(book => book !== bookObjectId);
+
+  user.wishlist = user.wishlist.filter(
+    item => item.bookID.toString() !== bookObjectId.toString(),
+  );
+
   await user.save();
   return user;
 };
@@ -198,9 +202,10 @@ const updateReadingStatus = async (
   return user;
 };
 
-
-const userProfile = async (userId: string): Promise<IUser | null> => { 
-  const result = await User.findById(userId);
+const userProfile = async (userId: string): Promise<IUser | null> => {
+  const result = await User.findById(userId)
+    .populate('wishlist')
+    .populate('readingList.book');
   return result;
 };
 
