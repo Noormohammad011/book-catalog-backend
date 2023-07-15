@@ -113,6 +113,17 @@ const updateReadingStatus = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const userProfile = catchAsync(async (req: Request, res: Response) => { 
+  const { _id: userId } = req.user as { _id: string };
+  const result = await UserService.userProfile(userId);
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Wishlist Updated successfully!',
+    data: result,
+  });
+});
+
 export const AuthController = {
   createUser,
   loginUser,
@@ -121,4 +132,5 @@ export const AuthController = {
   removeFromWishlist,
   addBookToReadingList,
   updateReadingStatus,
+  userProfile,
 };

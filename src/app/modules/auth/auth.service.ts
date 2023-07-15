@@ -198,6 +198,12 @@ const updateReadingStatus = async (
   return user;
 };
 
+
+const userProfile = async (userId: string): Promise<IUser | null> => { 
+  const result = await User.findById(userId);
+  return result;
+};
+
 export const UserService = {
   createUser,
   loginUser,
@@ -206,4 +212,5 @@ export const UserService = {
   removeFromWishlist,
   addBookToReadingList,
   updateReadingStatus,
+  userProfile,
 };

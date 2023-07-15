@@ -1,33 +1,31 @@
 import express from 'express';
+import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
-import { UserValidator } from './auth.validation';
 import { AuthController } from './auth.controller';
+import { UserValidator } from './auth.validation';
 
 const router = express.Router();
-
 
 router.post(
   '/signup',
   validateRequest(UserValidator.createUserZodSchema),
-  AuthController.createUser
+  AuthController.createUser,
 );
 router.post(
   '/login',
   validateRequest(UserValidator.loginZodSchema),
-  AuthController.loginUser
+  AuthController.loginUser,
 );
-
 router.post(
   '/refresh-token',
   validateRequest(UserValidator.refreshTokenZodSchema),
-  AuthController.refreshToken
+  AuthController.refreshToken,
 );
 
-router.post('/reading-list', AuthController.addBookToReadingList);
-router.patch('/reading-list', AuthController.updateReadingStatus);
-
-router.post('/wishlist', AuthController.createWishlist);
-router.delete('/wishlist/:bookId', AuthController.removeFromWishlist);
-
+router.get('/me', auth(), AuthController.userProfile);
+router.post('/reading-list', auth(), AuthController.addBookToReadingList);
+router.patch('/reading-list', auth(), AuthController.updateReadingStatus);
+router.post('/wishlist', auth(), AuthController.createWishlist);
+router.delete('/wishlist/:bookId', auth(), AuthController.removeFromWishlist);
 
 export const AuthRoute = router;
