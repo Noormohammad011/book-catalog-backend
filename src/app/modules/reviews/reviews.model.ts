@@ -8,6 +8,11 @@ const reviewSchema = new Schema<IReview, ReviewModel>(
       ref: 'User',
       required: true,
     },
+    book: {
+      type: Schema.Types.ObjectId,
+      ref: 'Book',
+      required: true,
+    },
     comment: {
       type: String,
       required: true,
