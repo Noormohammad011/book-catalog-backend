@@ -110,7 +110,7 @@ const updateBook = async (
   userID: string,
   payload: IBook,
 ): Promise<IBook | null> => {
-  const isExist = await Book.findOne({ _id: id, author: userID });
+  const isExist = await Book.findOne({ _id: id, authorID: userID });
   if (!isExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found !');
   }
@@ -130,7 +130,7 @@ const deleteBook = async (
   const session = await Book.startSession();
   try {
     session.startTransaction();
-    const isExist = await Book.findOne({ _id: id, author: userID });
+    const isExist = await Book.findOne({ _id: id, authorID: userID });
     if (!isExist) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found !');
     }
