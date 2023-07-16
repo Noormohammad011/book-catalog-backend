@@ -36,15 +36,15 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   }
 
   //create access token & refresh token
-  const { _id, email: userEmail } = isUserExist;
+  const { _id, email: userEmail, name } = isUserExist;
   const accessToken = jwtHelpers.createToken(
-    { _id, userEmail },
+    { _id, email: userEmail, name },
     config.jwt.secret as Secret,
     config.jwt.expires_in as string,
   );
 
   const refreshToken = jwtHelpers.createToken(
-    { _id, userEmail },
+    { _id, email: userEmail, name },
     config.jwt.refresh_secret as Secret,
     config.jwt.refresh_expires_in as string,
   );
@@ -79,6 +79,7 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
     {
       _id: isUserExist._id,
       email: isUserExist.email,
+      name: isUserExist.name,
     },
     config.jwt.secret as Secret,
     config.jwt.expires_in as string,

@@ -38,7 +38,7 @@ export type IRefreshTokenResponse = {
 export type UserModel = {
   isUserExist: (
     email: string,
-  ) => Promise<Pick<IUser, 'password' | 'email' | '_id'>>;
+  ) => Promise<Pick<IUser, 'password' | 'email' | '_id' | 'name'>>;
   isPasswordMatched(
     givenPassword: string,
     savedPassword: string,
