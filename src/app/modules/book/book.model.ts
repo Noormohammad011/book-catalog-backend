@@ -31,6 +31,9 @@ export const bookSchema = new Schema<IBook, BookModel>(
         reviewID: {
           type: Schema.Types.ObjectId,
         },
+        comment: {
+          type: String,
+        },
       }
     ],
   },

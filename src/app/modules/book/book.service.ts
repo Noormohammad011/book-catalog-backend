@@ -51,15 +51,7 @@ const getAllBooks = async (
 
   const result = await Book.find(whereConditions)
     .populate({
-      path: 'authorID',
-      populate: {
-        path: 'readingList.book',
-        select: '-status', // Exclude the 'status' field from the book object in readingList
-      },
-    })
-    .populate({
       path: 'reviews',
-      select: 'comment user',
     })
     .sort(sortConditions)
     .skip(skip)
@@ -97,16 +89,15 @@ const createBook = async (
 };
 
 const getSingleBook = async (id: string): Promise<IBook | null> => {
-  const cow = await Book.findById({ _id: id })
+  const result = await Book.findById({ _id: id })
     .populate({
-      path: 'author',
+      path: 'authorID',
       select: 'readingList wishlist email _id',
     })
     .populate({
       path: 'reviews',
-      select: 'comment user _id',
     });
-  return cow;
+  return result;
 };
 
 const updateBook = async (

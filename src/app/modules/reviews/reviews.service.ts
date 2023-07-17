@@ -38,7 +38,10 @@ const createReview = async (
       book.reviews = [];
     }
 
-    book.reviews.push({ reviewID: review[0]._id });
+    book.reviews.push({
+      reviewID: review[0]._id,
+      comment: review[0].comment,
+    });
 
     await book.save({ session });
 
