@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { BookModel, Genres, IBook } from './book.interface';
+import moment from 'moment';
 
 export const bookSchema = new Schema<IBook, BookModel>(
   {
@@ -46,7 +47,7 @@ export const bookSchema = new Schema<IBook, BookModel>(
 bookSchema.set('toJSON', {
   transform: function (doc, ret) {
     if (ret.publicationDate instanceof Date) {
-      ret.publicationDate = ret.publicationDate.toLocaleDateString('en-US');
+      ret.publicationDate = moment(ret.publicationDate).format('MM/DD/YYYY');
     }
   },
 });

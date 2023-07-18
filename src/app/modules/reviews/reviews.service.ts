@@ -56,8 +56,23 @@ const createReview = async (
   }
 };
 
-
+const getReviews = async (id: string): Promise<IReview[]> => {
+  const result = Review.find({
+    book: id,
+  })
+    .populate({
+      path: 'user',
+      select: 'name -_id',
+    })
+    .select({
+      comment: 1,
+      user: 1,
+    
+    });
+  return result;
+};
 
 export const ReviewService = {
-    createReview,
-}
+  createReview,
+  getReviews,
+};

@@ -2,7 +2,7 @@ import { Document, Model, Types } from 'mongoose';
 import { IUser } from '../auth/auth.interface';
 import { IReview } from '../reviews/reviews.interface';
 
-export enum Genres { 
+export enum Genres {
   Fantasy = 'Fantasy',
   ScienceFiction = 'Science Fiction',
   Horror = 'Horror',
@@ -19,11 +19,10 @@ export enum Genres {
   SelfHelp = 'Self Help',
 }
 
-
 export interface IBook extends Document {
   title: string;
-  author: string;
-  authorID: Types.ObjectId | IUser;
+  author?: string;
+  authorID?: Types.ObjectId | IUser;
   genre: Genres;
   publicationDate: Date;
   reviews?: Array<{
@@ -38,6 +37,5 @@ export type IBookFilters = {
   fromDate?: Date;
   toDate?: Date;
 };
-
 
 export type BookModel = Model<IBook, Record<string, unknown>>;
