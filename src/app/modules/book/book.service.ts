@@ -50,9 +50,7 @@ const getAllBooks = async (
     andConditions.length > 0 ? { $and: andConditions } : {};
 
   const result = await Book.find(whereConditions)
-    .populate({
-      path: 'reviews',
-    })
+    .select('_id title author genre publicationDate')
     .sort(sortConditions)
     .skip(skip)
     .limit(limit);

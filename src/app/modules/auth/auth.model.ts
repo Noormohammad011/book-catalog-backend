@@ -26,6 +26,9 @@ const userSchema = new Schema<IUser, UserModel>(
           type: Schema.Types.ObjectId,
           ref: 'Book',
         },
+        bookName: {
+          type: String,
+        },
       },
     ],
     readingList: [
@@ -34,6 +37,9 @@ const userSchema = new Schema<IUser, UserModel>(
         book: {
           type: Schema.Types.ObjectId,
           ref: 'Book',
+        },
+        bookName: {
+          type: String,
         },
         status: {
           type: String,

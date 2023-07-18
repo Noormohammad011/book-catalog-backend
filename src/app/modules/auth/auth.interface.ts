@@ -15,9 +15,13 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  wishlist?: Array<{ bookID: Types.ObjectId | IBook }>;
+  wishlist?: Array<{
+    bookID: Types.ObjectId | IBook,
+    bookName?: string,
+  }>;
   readingList?: Array<{
     book: Types.ObjectId | IBook;
+    bookName?: string;
     status: ReadingStatusType;
   }>;
 }

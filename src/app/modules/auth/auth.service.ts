@@ -5,6 +5,7 @@ import config from '../../../config';
 import ApiError from '../../../errors/ApiError';
 import { jwtHelpers } from '../../../helpers/jwtHelpers';
 import { IBook } from '../book/book.interface';
+import { Book } from '../book/book.model';
 import {
   ILoginUser,
   ILoginUserResponse,
@@ -95,6 +96,9 @@ const createWishlist = async (
   bookId: string,
 ): Promise<IUser | null> => {
   const bookObjectId = new Types.ObjectId(bookId) as Types.ObjectId & IBook;
+  const existingBook = await Book.findOne({
+    _id: bookId,
+  });
   const user = await User.findById(userId);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
@@ -110,7 +114,7 @@ const createWishlist = async (
   if (!user.wishlist) {
     user.wishlist = [];
   }
-  user.wishlist.push({ bookID: bookObjectId });
+  user.wishlist.push({ bookID: bookObjectId, bookName: existingBook?.title });
   await user.save();
   return user;
 };
@@ -144,6 +148,9 @@ const addBookToReadingList = async (
   status: ReadingStatusType,
 ): Promise<IUser | null> => {
   const bookObjectId = new Types.ObjectId(bookId);
+  const existingBook = await Book.findOne({
+    _id: bookId,
+  });
   const user = await User.findById(userId);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found!');
@@ -165,6 +172,7 @@ const addBookToReadingList = async (
   // Add the book to the reading list
   const readingItem = {
     book: bookObjectId,
+    bookName: existingBook?.title,
     status,
   };
   user.readingList.push(readingItem);
@@ -203,17 +211,14 @@ const updateReadingStatus = async (
 };
 
 const userProfile = async (userId: string): Promise<IUser | null> => {
-  const result = await User.findById(userId)
-    .populate({
-      path: 'wishlist.bookID',
-      select: '-_id', // Exclude _id field
-    })
-    .populate({
-      path: 'readingList.book',
-      select: '-_id', 
-    });
+  const result = await User.findById(userId).select(
+    'name wishlist readingList',
+  );
   return result;
 };
+
+
+
 export const UserService = {
   createUser,
   loginUser,
