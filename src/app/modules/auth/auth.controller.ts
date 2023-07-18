@@ -119,7 +119,7 @@ const userProfile = catchAsync(async (req: Request, res: Response) => {
   sendResponse<IUser>(res, {
     statusCode: httpStatus.CREATED,
     success: true,
-    message: 'Wishlist Updated successfully!',
+    message: 'Profile fetched successfully!',
     data: result,
   });
 });
