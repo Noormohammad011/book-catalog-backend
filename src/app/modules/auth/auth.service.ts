@@ -4,7 +4,6 @@ import { Types } from 'mongoose';
 import config from '../../../config';
 import ApiError from '../../../errors/ApiError';
 import { jwtHelpers } from '../../../helpers/jwtHelpers';
-import { IBook } from '../book/book.interface';
 import { Book } from '../book/book.model';
 import {
   ILoginUser,
@@ -95,26 +94,33 @@ const createWishlist = async (
   userId: string,
   bookId: string,
 ): Promise<IUser | null> => {
-  const bookObjectId = new Types.ObjectId(bookId) as Types.ObjectId & IBook;
+  const bookObjectId = new Types.ObjectId(bookId);
   const existingBook = await Book.findOne({
     _id: bookId,
   });
   const user = await User.findById(userId);
+
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-  }
-  // Check if the book is already in the wishlist
-  if (
-    user.wishlist &&
-    user.wishlist.some(item => item.bookID.equals(bookObjectId))
-  ) {
-    throw new ApiError(httpStatus.CONFLICT, 'Book already in the wishlist');
   }
 
   if (!user.wishlist) {
     user.wishlist = [];
   }
-  user.wishlist.push({ bookID: bookObjectId, bookName: existingBook?.title });
+
+  // Check if the book is already in the wishlist
+  const existingBookIndex = user.wishlist.findIndex(
+    wishlistItem => wishlistItem.bookID.toString() === bookId,
+  );
+  if (existingBookIndex !== -1) {
+    throw new ApiError(httpStatus.CONFLICT, 'Book already in the wishlist');
+  }
+
+  user.wishlist.push({
+    bookID: bookObjectId,
+    bookName: existingBook?.title,
+  });
+
   await user.save();
   return user;
 };
@@ -216,8 +222,6 @@ const userProfile = async (userId: string): Promise<IUser | null> => {
   );
   return result;
 };
-
-
 
 export const UserService = {
   createUser,

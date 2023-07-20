@@ -57,9 +57,7 @@ const createReview = async (
 };
 
 const getReviews = async (id: string): Promise<IReview[]> => {
-  const result = Review.find({
-    book: id,
-  })
+  const result = await Review.find({ book: id })
     .populate({
       path: 'user',
       select: 'name -_id',
@@ -67,11 +65,9 @@ const getReviews = async (id: string): Promise<IReview[]> => {
     .select({
       comment: 1,
       user: 1,
-    
     });
   return result;
 };
-
 export const ReviewService = {
   createReview,
   getReviews,
