@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
-import config from '../../../config';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import {
@@ -27,12 +26,15 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   const { refreshToken, ...others } = result;
 
   // set refresh token into cookie
-
-  const cookieOptions = {
-    secure: config.env === 'production',
+  const cookieOptions: {
+    secure: boolean;
+    httpOnly: boolean;
+    sameSite?: 'none' | undefined;
+  } = {
+    secure: true,
     httpOnly: true,
+    sameSite: 'none',
   };
-
   res.cookie('refreshToken', refreshToken, cookieOptions);
 
   sendResponse<ILoginUserResponse>(res, {
@@ -50,11 +52,15 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 
   // set refresh token into cookie
 
-  const cookieOptions = {
-    secure: config.env === 'production',
+  const cookieOptions: {
+    secure: boolean;
+    httpOnly: boolean;
+    sameSite?: 'none' | undefined;
+  } = {
+    secure: true,
     httpOnly: true,
+    sameSite: 'none',
   };
-
   res.cookie('refreshToken', refreshToken, cookieOptions);
 
   sendResponse<IRefreshTokenResponse>(res, {
@@ -101,7 +107,7 @@ const addBookToReadingList = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const updateReadingStatus = catchAsync(async (req: Request, res: Response) => { 
+const updateReadingStatus = catchAsync(async (req: Request, res: Response) => {
   const { _id: userId } = req.user as { _id: string };
   const { bookId, status } = req.body;
   const result = await UserService.updateReadingStatus(userId, bookId, status);
@@ -113,7 +119,7 @@ const updateReadingStatus = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const userProfile = catchAsync(async (req: Request, res: Response) => { 
+const userProfile = catchAsync(async (req: Request, res: Response) => {
   const { _id: userId } = req.user as { _id: string };
   const result = await UserService.userProfile(userId);
   sendResponse<IUser>(res, {

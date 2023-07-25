@@ -1,22 +1,29 @@
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Application, NextFunction, Request, Response } from 'express';
 import httpStatus from 'http-status';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import routes from './app/routes';
-import cookieParser from 'cookie-parser';
 
 const app: Application = express();
 
-app.use(cors());
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',
+    'https://iridescent-dieffenbachia-ca41fb.netlify.app',
+    'https://book-catalog-app-lac.vercel.app',
+  ],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(cookieParser());
 
 //parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
 app.use('/api/v1', routes);
-
 
 // global error handler
 app.use(globalErrorHandler);
