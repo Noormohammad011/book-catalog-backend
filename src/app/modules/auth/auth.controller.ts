@@ -71,6 +71,31 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const logoutUser = catchAsync(async (req: Request, res: Response) => {
+  const { _id: userId } = req.user as { _id: string };
+  const result = await UserService.logoutUser(userId);
+
+  const cookieOptions: {
+    secure: boolean;
+    httpOnly: boolean;
+    sameSite?: 'none' | undefined;
+  } = {
+    secure: true,
+    httpOnly: true,
+    sameSite: 'none',
+  };
+
+  // Remove the refreshToken cookie from the response
+  res.clearCookie('refreshToken', cookieOptions);
+
+  sendResponse<IRefreshTokenResponse>(res, {
+    statusCode: 200,
+    success: true,
+    message: 'User logged out successfully!',
+    data: result,
+  });
+});
+
 const createWishlist = catchAsync(async (req: Request, res: Response) => {
   const { _id: userId } = req.user as { _id: string };
   const { bookId } = req.body;
@@ -139,4 +164,5 @@ export const AuthController = {
   addBookToReadingList,
   updateReadingStatus,
   userProfile,
+  logoutUser,
 };

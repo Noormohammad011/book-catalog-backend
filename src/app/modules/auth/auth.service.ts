@@ -90,6 +90,18 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
   };
 };
 
+const logoutUser = async (
+  userId: string,
+): Promise<IRefreshTokenResponse | null> => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  return {
+    accessToken: '',
+  };
+};
+
 const createWishlist = async (
   userId: string,
   bookId: string,
@@ -232,4 +244,5 @@ export const UserService = {
   addBookToReadingList,
   updateReadingStatus,
   userProfile,
+  logoutUser,
 };
